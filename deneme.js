@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, FlatList, Image, TouchableOpacity, StyleSheet, Modal, ScrollView, Dimensions } from 'react-native';
+import { View, Text, TextInput, Button, FlatList, TouchableOpacity, StyleSheet, Modal, Image } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const App = () => {
@@ -8,8 +9,6 @@ const App = () => {
   const [books, setBooks] = useState([]);
   const [searchText, setSearchText] = useState('');
   const [isAdding, setIsAdding] = useState(false);
-  const [showRead, setShowRead] = useState(true);
-  const windowWidth = Dimensions.get('window').width;
 
   useEffect(() => {
     loadBooks();
@@ -61,12 +60,29 @@ const App = () => {
 
   const filteredBooks = books.filter(
     book => book.bookName.toLowerCase().includes(searchText.toLowerCase()) ||
-            book.authorName.toLowerCase().includes(searchText.toLowerCase())
+      book.authorName.toLowerCase().includes(searchText.toLowerCase())
   );
 
-  const renderBookItem = ({ item, index }) => (
-    <View style={styles.bookItem}>
-      <Text style={styles.bookNumber}>{index + 1}</Text>
+  return (
+    <View style={styles.container}>
+      <View style={styles.navbar}>
+        <Text style={styles.navbarTitle}>BookList</Text>
+        <TouchableOpacity onPress={() => setIsAdding(true)}>
+          <Image style={{ height: 20, width: 20, tintColor: "white" }} source={require("./assets/icons/add.png")} />
+        </TouchableOpacity>
+      </View>
+      <TextInput
+        placeholderTextColor={"gray"}
+        placeholder="Ara..."
+        value={searchText}
+        onChangeText={setSearchText}
+        style={styles.searchbar}
+      />
+      <FlatList
+        data={filteredBooks}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.bookItem}>
             <TouchableOpacity onPress={() => toggleReadStatus(item.id)}>
               <View style={[styles.checkbox, item.read && styles.checkboxChecked]} />
             </TouchableOpacity>
@@ -84,41 +100,9 @@ const App = () => {
             <Image style={{ height: 18, width: 18, tintColor: "#004aad" }} source={require("./assets/icons/delete.png")} />
             </TouchableOpacity>
           </View>
-  );
-
-  return (
-    <View style={styles.container}>
-      <View style={styles.navbar}>
-        <Text style={styles.navbarTitle}>BookList</Text>
-        <TouchableOpacity onPress={() => setIsAdding(true)}>
-          <View style={{height: 30, width: 30,  justifyContent: 'center', 
-            alignItems: 'flex-end'
-          }}>
-          <Image style={{ height: 20, width: 20, tintColor: "white" }} source={require("./assets/icons/add.png")} />
-
-          </View>
-        </TouchableOpacity>
-      </View>
-      <TextInput
-      placeholderTextColor={"gray"}
-        placeholder="Ara..."
-        value={searchText}
-        onChangeText={setSearchText}
-        style={styles.searchbar}
+        )}
       />
-      <View style={styles.tabContainer}>
-        <TouchableOpacity onPress={() => setShowRead(true)} style={[styles.tab, showRead && styles.activeTab]}>
-          <Text style={styles.tabText}>Okuduklarım</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setShowRead(false)} style={[styles.tab, !showRead && styles.activeTab]}>
-          <Text style={styles.tabText}>Okumadıklarım</Text>
-        </TouchableOpacity>
-      </View>
-      <FlatList
-        data={filteredBooks.filter(book => book.read === showRead)}
-        keyExtractor={item => item.id}
-        renderItem={renderBookItem}
-      />
+
       <Modal
         visible={isAdding}
         animationType="fade"
@@ -129,14 +113,14 @@ const App = () => {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Yeni Kitap Ekle</Text>
             <TextInput
-            placeholderTextColor={"gray"}
+              placeholderTextColor={"gray"}
               placeholder="Kitap İsmi"
               value={bookName}
               onChangeText={setBookName}
               style={styles.input}
             />
             <TextInput
-            placeholderTextColor={"gray"}
+              placeholderTextColor={"gray"}
               placeholder="Yazar İsmi"
               value={authorName}
               onChangeText={setAuthorName}
@@ -161,7 +145,6 @@ const App = () => {
 };
 
 const styles = StyleSheet.create({
-  
   container: {
     flex: 1,
     paddingTop: 20,
@@ -192,39 +175,10 @@ const styles = StyleSheet.create({
     paddingLeft: 16,
     margin: 16,
     marginTop: 12,
-    marginBottom: 8,
+    marginBottom: 12,
     borderRadius: 8,
     color: "black",
     fontFamily: "Manrope-Regular",
-  },
-  tabContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    marginTop: 0,
-    marginBottom: 8,
-    borderBottomWidth: 0.7,
-    borderColor: "#004aad",
-    marginLeft: 16,
-    marginRight: 16,
-    //backgroundColor: "red",
-    alignItems: 'center'
-  },
-  tab: { 
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    alignItems: 'center'
-  },
-  activeTab: {
-    backgroundColor: '#F4F9FF',
-    alignItems: 'center',
-    borderRadius: 4,
-  },
-  tabText: {
-    fontSize: 14,
-    fontFamily: "Manrope-Medium",
-    color: "black",
-    alignItems: 'center',
   },
   bookItem: {
     flexDirection: 'row',
@@ -239,13 +193,6 @@ const styles = StyleSheet.create({
     paddingBottom: 6,
     backgroundColor: "#F4F9FF",
     borderRadius: 8,
-  },
-  bookNumber: { 
-    marginRight: 12,
-    color: "black",
-    marginLeft: 2,
-    fontSize: 14,
-    fontFamily: "Manrope-Medium",
   },
   checkbox: {
     width: 20,
@@ -280,9 +227,6 @@ const styles = StyleSheet.create({
     color: 'gray',
     textDecorationLine: 'line-through',
     fontFamily: "Manrope-Regular",
-  },
-  deleteIcon: { ////////////////////////////////////////
-    marginLeft: 10,
   },
   modalContainer: {
     flex: 1,
