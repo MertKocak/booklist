@@ -1,3 +1,5 @@
+![Adsız tasarım (3)](https://github.com/user-attachments/assets/84e31efe-9335-4bde-9fc7-9372a16f7932)
+
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
 # Getting Started
